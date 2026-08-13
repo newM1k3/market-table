@@ -1,0 +1,131 @@
+{
+  "collections": [
+    {
+      "name": "markets",
+      "type": "base",
+      "schema": [
+        { "name": "name", "type": "text", "required": true },
+        { "name": "slug", "type": "text", "required": true, "unique": true },
+        { "name": "location", "type": "text" },
+        { "name": "floor_plan_url", "type": "url" }
+      ]
+    },
+    {
+      "name": "stalls",
+      "type": "base",
+      "schema": [
+        { "name": "market_id", "type": "relation", "required": true, "options": { "collectionId": "markets" } },
+        { "name": "label", "type": "text", "required": true },
+        { "name": "x", "type": "number", "required": true },
+        { "name": "y", "type": "number", "required": true },
+        { "name": "category", "type": "select", "options": { "values": ["produce", "bakery", "dairy", "meat", "prepared", "flowers", "pantry", "other"] } }
+      ]
+    },
+    {
+      "name": "vendors",
+      "type": "base",
+      "schema": [
+        { "name": "market_id", "type": "relation", "required": true, "options": { "collectionId": "markets" } },
+        { "name": "name", "type": "text", "required": true },
+        { "name": "description", "type": "text" },
+        { "name": "stall_id", "type": "relation", "options": { "collectionId": "stalls" } },
+        { "name": "logo_url", "type": "file" },
+        { "name": "claimed", "type": "bool", "required": true },
+        { "name": "contact_email", "type": "email" }
+      ]
+    },
+    {
+      "name": "products",
+      "type": "base",
+      "schema": [
+        { "name": "vendor_id", "type": "relation", "required": true, "options": { "collectionId": "vendors" } },
+        { "name": "name", "type": "text", "required": true },
+        { "name": "category", "type": "text" },
+        { "name": "price_estimate", "type": "text" },
+        { "name": "seasonal_tags", "type": "json" }
+      ]
+    },
+    {
+      "name": "seasonal_availability",
+      "type": "base",
+      "schema": [
+        { "name": "product_name", "type": "text", "required": true },
+        { "name": "season", "type": "select", "options": { "values": ["spring", "summer", "fall", "winter", "year-round"] } },
+        { "name": "months", "type": "json" },
+        { "name": "source", "type": "text" }
+      ]
+    },
+    {
+      "name": "recipes",
+      "type": "base",
+      "schema": [
+        { "name": "market_id", "type": "relation", "required": true, "options": { "collectionId": "markets" } },
+        { "name": "title", "type": "text", "required": true },
+        { "name": "description", "type": "text" },
+        { "name": "image_url", "type": "file" },
+        { "name": "source", "type": "select", "required": true, "options": { "values": ["curated", "community"] } },
+        { "name": "author_id", "type": "relation", "options": { "collectionId": "shoppers" } },
+        { "name": "status", "type": "select", "required": true, "options": { "values": ["pending", "approved", "rejected"] } },
+        { "name": "cook_time_min", "type": "number" },
+        { "name": "servings", "type": "number" },
+        { "name": "seasonal_tags", "type": "json" },
+        { "name": "foodland_url", "type": "url" }
+      ]
+    },
+    {
+      "name": "recipe_ingredients",
+      "type": "base",
+      "schema": [
+        { "name": "recipe_id", "type": "relation", "required": true, "options": { "collectionId": "recipes" } },
+        { "name": "product_name", "type": "text", "required": true },
+        { "name": "quantity", "type": "text" },
+        { "name": "unit", "type": "text" }
+      ]
+    },
+    {
+      "name": "shoppers",
+      "type": "auth",
+      "schema": [
+        { "name": "phone_hash", "type": "text", "unique": true },
+        { "name": "market_id", "type": "relation", "options": { "collectionId": "markets" } },
+        { "name": "display_name", "type": "text" }
+      ],
+      "options": {
+        "allowEmailAuth": false,
+        "allowOAuth2Auth": false
+      }
+    },
+    {
+      "name": "pantry_items",
+      "type": "base",
+      "schema": [
+        { "name": "shopper_id", "type": "relation", "required": true, "options": { "collectionId": "shoppers" } },
+        { "name": "product_name", "type": "text", "required": true },
+        { "name": "vendor_id", "type": "relation", "options": { "collectionId": "vendors" } },
+        { "name": "quantity", "type": "text" },
+        { "name": "purchased_at", "type": "date", "required": true }
+      ]
+    },
+    {
+      "name": "scan_logs",
+      "type": "base",
+      "schema": [
+        { "name": "market_id", "type": "relation", "required": true, "options": { "collectionId": "markets" } },
+        { "name": "shopper_id", "type": "relation", "options": { "collectionId": "shoppers" } },
+        { "name": "vendor_id", "type": "relation", "required": true, "options": { "collectionId": "vendors" } },
+        { "name": "recipe_id", "type": "relation", "options": { "collectionId": "recipes" } },
+        { "name": "items", "type": "json" },
+        { "name": "scanned_at", "type": "date", "required": true }
+      ]
+    },
+    {
+      "name": "vendor_recipe_highlights",
+      "type": "base",
+      "schema": [
+        { "name": "vendor_id", "type": "relation", "required": true, "options": { "collectionId": "vendors" } },
+        { "name": "recipe_id", "type": "relation", "required": true, "options": { "collectionId": "recipes" } },
+        { "name": "highlighted_by", "type": "select", "options": { "values": ["auto", "admin", "vendor"] } }
+      ]
+    }
+  ]
+}
